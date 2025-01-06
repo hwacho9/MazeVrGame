@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8239320187562679502}
   - component: {fileID: 4222023224628583702}
   - component: {fileID: 2658748545488649033}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: WallPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104,7 +104,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1, y: 5, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &2658748545488649033
 MonoBehaviour:
@@ -118,8 +118,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecee858d4f40a664281ee762f2f392e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 10
-  height: 10
+  size: 11
   wallPrefab: {fileID: 0}
   floorPrefab: {fileID: 0}
-  player: {fileID: 0}
+  exitPrefab: {fileID: 0}
+  xrRig: {fileID: 0}
+  miniMapImage: {fileID: 0}
