@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8239320187562679502}
   - component: {fileID: 4222023224628583702}
   - component: {fileID: 2658748545488649033}
+  - component: {fileID: -3636144083713324596}
   m_Layer: 3
   m_Name: WallPrefab
   m_TagString: Untagged
@@ -124,3 +125,20 @@ MonoBehaviour:
   exitPrefab: {fileID: 0}
   xrRig: {fileID: 0}
   miniMapImage: {fileID: 0}
+  enemyManager: {fileID: 0}
+--- !u!208 &-3636144083713324596
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1897960377656074051}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 2.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
