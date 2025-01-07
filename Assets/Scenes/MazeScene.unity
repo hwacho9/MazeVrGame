@@ -1091,6 +1091,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8702534868499336141, guid: 2459a6af98a1eae4ebc79b1ffd638762, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1875779617}
+    - targetCorrespondingSourceObject: {fileID: 8702534868499336141, guid: 2459a6af98a1eae4ebc79b1ffd638762, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1875779618}
   m_SourcePrefab: {fileID: 100100000, guid: 2459a6af98a1eae4ebc79b1ffd638762, type: 3}
 --- !u!1 &1027015875 stripped
 GameObject:
@@ -2073,7 +2076,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -2112,6 +2115,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+--- !u!136 &1875779618
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1875779613}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 3
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &1957373496 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1717954561962503725, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
@@ -2189,7 +2215,7 @@ MonoBehaviour:
   enemyPrefab: {fileID: 1875779613}
   xrRig: {fileID: 1957373496}
   gameOverText: {fileID: 0}
-  restartButton: {fileID: 0}
+  restartButton: {fileID: 1290730516}
 --- !u!4 &1975643090
 Transform:
   m_ObjectHideFlags: 0

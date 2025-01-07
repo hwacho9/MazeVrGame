@@ -7,63 +7,66 @@ using TMPro;
 
 public class MazeGenerator : MonoBehaviour
 {
-    public int size = 11;                // ¹Ì·ÎÀÇ Å©±â (È¦¼ö ±ÇÀå)
-    public GameObject wallPrefab;        // º® ÇÁ¸®ÆÕ
-    public GameObject floorPrefab;       // ¹Ù´Ú ÇÁ¸®ÆÕ
-    public GameObject exitPrefab;        // Á¾·á ÁöÁ¡ ÇÁ¸®ÆÕ
-    public GameObject xrRig;             // XR Rig (ÇÃ·¹ÀÌ¾î)
-    public RawImage miniMapImage;        // ¹Ì´Ï¸ÊÀ» Ç¥½ÃÇÒ UI ÀÌ¹ÌÁö
-    public EnemyManager enemyManager;    // EnemyManager ÂüÁ¶
-    public TextMeshProUGUI endGameText;             // Á¾·á ¸Þ½ÃÁö UI
-    public Button restartButton;         // Àç½ÃÀÛ ¹öÆ° UI
+    public int size = 11;                // ï¿½Ì·ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ (È¦ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+    public GameObject wallPrefab;        // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    public GameObject floorPrefab;       // ï¿½Ù´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    public GameObject exitPrefab;        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    public GameObject xrRig;             // XR Rig (ï¿½Ã·ï¿½ï¿½Ì¾ï¿½)
+    public RawImage miniMapImage;        // ï¿½Ì´Ï¸ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ï¿½ï¿½ UI ï¿½Ì¹ï¿½ï¿½ï¿½
+    public EnemyManager enemyManager;    // EnemyManager ï¿½ï¿½ï¿½ï¿½
+    public TextMeshProUGUI endGameText;             // ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ UI
+    public Button restartButton;         // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° UI
 
-    private TileType[,] tile;            // ¹Ì·Î ¹è¿­ (Wall, Empty)
-    private Vector3 startPosition;       // ½ÃÀÛ ÁöÁ¡
-    private Vector3 exitPosition;        // Á¾·á ÁöÁ¡
-    private Texture2D miniMapTexture;    // ¹Ì´Ï¸Ê ÅØ½ºÃ³
-    private Vector2Int lastPlayerPosition; // ÀÌÀü ÇÃ·¹ÀÌ¾î À§Ä¡
+    private TileType[,] tile;            // ï¿½Ì·ï¿½ ï¿½è¿­ (Wall, Empty)
+    private Vector3 startPosition;       // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    private Vector3 exitPosition;        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    private Texture2D miniMapTexture;    // ï¿½Ì´Ï¸ï¿½ ï¿½Ø½ï¿½Ã³
+    private Vector2Int lastPlayerPosition; // ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Ä¡
 
-    private Color lastPlayerTileColor;   // ÀÌÀü ÇÃ·¹ÀÌ¾î À§Ä¡ÀÇ »ö»ó ÀúÀå º¯¼ö
+    private Color lastPlayerTileColor;   // ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
     public enum TileType { Wall, Empty };
 
     void Start()
     {
-        Initialize(size);    // ¹Ì·Î »ý¼º
-        DrawMaze();          // ¹Ì·Î ±×¸®±â
-        EnsurePath();        // °æ·Î°¡ º¸ÀåµÇµµ·Ï Ã³¸®
-        PlaceExit();         // Á¾·á ÁöÁ¡ »ý¼º
-        PlaceXRRig();        // XR Rig¸¦ ½ÃÀÛÁ¡À¸·Î ÀÌµ¿
-        GenerateMiniMap();   // ¹Ì´Ï¸Ê »ý¼º
+        // Time.timeScale ì´ˆê¸°í™”
+        Time.timeScale = 1;
 
-        // Àû »ý¼º ¿äÃ»
+        Initialize(size);    // ï¿½Ì·ï¿½ ï¿½ï¿½ï¿½ï¿½
+        DrawMaze();          // ï¿½Ì·ï¿½ ï¿½×¸ï¿½ï¿½ï¿½
+        EnsurePath();        // ï¿½ï¿½Î°ï¿½ ï¿½ï¿½ï¿½ï¿½Çµï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
+        PlaceExit();         // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        PlaceXRRig();        // XR Rigï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½
+        GenerateMiniMap();   // ï¿½Ì´Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½
+
+        // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã»
         enemyManager.SpawnEnemies(1, tile, size, transform);
 
-        // UI ÃÊ±âÈ­
+        // UI ï¿½Ê±ï¿½È­
         endGameText.gameObject.SetActive(false);
         restartButton.gameObject.SetActive(false);
     }
 
     void Update()
     {
-        UpdatePlayerOnMiniMap(); // ¸Å ÇÁ·¹ÀÓ¸¶´Ù ¹Ì´Ï¸Ê¿¡¼­ ÇÃ·¹ÀÌ¾î À§Ä¡ °»½Å
-        CheckExitReached();      // Á¾·á ÁöÁ¡ µµ´Þ ¿©ºÎ È®ÀÎ
+        UpdatePlayerOnMiniMap(); // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ó¸ï¿½ï¿½ï¿½ ï¿½Ì´Ï¸Ê¿ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
+        CheckExitReached();      // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
     }
 
     public void Initialize(int size)
     {
         if (size % 2 == 0)
         {
-            Debug.LogError("¹Ì·Î Å©±â´Â È¦¼ö¿©¾ß ÇÕ´Ï´Ù.");
+            Debug.LogError("ï¿½Ì·ï¿½ Å©ï¿½ï¿½ï¿½ È¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Õ´Ï´ï¿½.");
             return;
         }
 
         tile = new TileType[size, size];
 
-        // Binary Tree ¾Ë°í¸®ÁòÀ¸·Î ¹Ì·Î »ý¼º
+        // Binary Tree ï¿½Ë°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì·ï¿½ ï¿½ï¿½ï¿½ï¿½
         GenerateByBinaryTree();
 
-        // ½ÃÀÛ ÁöÁ¡°ú Á¾·á ÁöÁ¡ ¼³Á¤
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         startPosition = new Vector3(1, 0, 1);                 // (1,1)
         exitPosition = new Vector3(size - 2, 0, size - 2);   // (size-2, size-2)
     }
@@ -282,59 +285,59 @@ public class MazeGenerator : MonoBehaviour
         Vector3 playerPosition = xrRig.transform.position;
         float distance = Vector3.Distance(playerPosition, exitPosition);
 
-        Debug.Log($"ÇÃ·¹ÀÌ¾î À§Ä¡: {playerPosition}, Á¾·á ÁöÁ¡: {exitPosition}, °Å¸®: {distance}");
+        Debug.Log($"ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Ä¡: {playerPosition}, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: {exitPosition}, ï¿½Å¸ï¿½: {distance}");
 
         if (distance < 0.5f)
         {
-            Debug.Log("ÇÃ·¹ÀÌ¾î°¡ Á¾·á ÁöÁ¡¿¡ µµÂøÇß½À´Ï´Ù!"); // ·Î±× Ãâ·Â
+            Debug.Log("ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ß½ï¿½ï¿½Ï´ï¿½!"); // ï¿½Î±ï¿½ ï¿½ï¿½ï¿½
             EndGame();
         }
         else
         {
-            Debug.Log("ÇÃ·¹ÀÌ¾î°¡ ¾ÆÁ÷ Á¾·á ÁöÁ¡¿¡ µµ´ÞÇÏÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.Log("ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾Ò½ï¿½ï¿½Ï´ï¿½.");
         }
     }
 
 
     void EndGame()
     {
-        // Á¾·á ¸Þ½ÃÁö ¹× Àç½ÃÀÛ ¹öÆ° È°¼ºÈ­
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° È°ï¿½ï¿½È­
         if (endGameText != null && restartButton != null)
         {
-            endGameText.text = "Å»Ãâ ¼º°ø! °ÔÀÓ Á¾·á!";
+            endGameText.text = "Å»ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½! ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½!";
             endGameText.gameObject.SetActive(true);
             restartButton.gameObject.SetActive(true);
 
-            // °ÔÀÓ ¸ØÃã
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             Time.timeScale = 0;
 
-            Debug.Log("°ÔÀÓ Á¾·á È­¸éÀÌ Ç¥½ÃµÇ¾ú½À´Ï´Ù.");
+            Debug.Log("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È­ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ÃµÇ¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
         }
         else
         {
-            Debug.LogError("endGameText ¶Ç´Â restartButtonÀÌ ¼³Á¤µÇÁö ¾Ê¾Ò½À´Ï´Ù. UI¸¦ È®ÀÎÇÏ¼¼¿ä.");
+            Debug.LogError("endGameText ï¿½Ç´ï¿½ restartButtonï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾Ò½ï¿½ï¿½Ï´ï¿½. UIï¿½ï¿½ È®ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½.");
         }
     }
 
 
     public void RestartGame()
     {
-        // ±âÁ¸ ¸Ê Á¦°Å
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         foreach (Transform child in transform)
         {
             Destroy(child.gameObject);
         }
 
-        // ¹Ì´Ï¸Ê ÅØ½ºÃ³ ÃÊ±âÈ­
+        // ï¿½Ì´Ï¸ï¿½ ï¿½Ø½ï¿½Ã³ ï¿½Ê±ï¿½È­
         if (miniMapTexture != null)
         {
             Destroy(miniMapTexture);
         }
 
-        // Time.timeScaleÀ» ´Ù½Ã 1·Î ¼³Á¤
+        // Time.timeScaleï¿½ï¿½ ï¿½Ù½ï¿½ 1ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         Time.timeScale = 1;
 
-        // Á¾·á ¸Þ½ÃÁö¿Í ¹öÆ° ¼û±è
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° ï¿½ï¿½ï¿½ï¿½
         if (endGameText != null)
         {
             endGameText.gameObject.SetActive(false);
@@ -344,19 +347,19 @@ public class MazeGenerator : MonoBehaviour
             restartButton.gameObject.SetActive(false);
         }
 
-        // ¹Ì·Î Àç»ý¼º
-        Initialize(size);    // ¹Ì·Î ¹è¿­ ÃÊ±âÈ­
-        DrawMaze();          // ¹Ì·Î ±×¸®±â
-        EnsurePath();        // °æ·Î È®ÀÎ
-        PlaceExit();         // Á¾·á ÁöÁ¡ ¼³Á¤
-        PlaceXRRig();        // ÇÃ·¹ÀÌ¾î ½ÃÀÛ À§Ä¡·Î ÀÌµ¿
-        GenerateMiniMap();   // ¹Ì´Ï¸Ê Àç»ý¼º
+        // ï¿½Ì·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
+        Initialize(size);    // ï¿½Ì·ï¿½ ï¿½è¿­ ï¿½Ê±ï¿½È­
+        DrawMaze();          // ï¿½Ì·ï¿½ ï¿½×¸ï¿½ï¿½ï¿½
+        EnsurePath();        // ï¿½ï¿½ï¿½ È®ï¿½ï¿½
+        PlaceExit();         // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        PlaceXRRig();        // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ìµï¿½
+        GenerateMiniMap();   // ï¿½Ì´Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
 
-        // Àû Àç»ý¼º
-        enemyManager.ClearEnemies(); // Àû ¸ñ·Ï ÃÊ±âÈ­
+        // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
+        enemyManager.ClearEnemies(); // ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
         enemyManager.SpawnEnemies(1, tile, size, transform);
 
-        Debug.Log("¸Ê°ú °ÔÀÓÀÌ Àç½ÃÀÛµÇ¾ú½À´Ï´Ù!");
+        Debug.Log("ï¿½Ê°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ÛµÇ¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½!");
     }
 
 }
