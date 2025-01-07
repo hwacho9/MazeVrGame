@@ -1,0 +1,65 @@
+{
+    "name": "XRInputActions",
+    "maps": [
+        {
+            "name": "XR Controller",
+            "id": "22d46174-2988-4480-91b8-917bfe0f7565",
+            "actions": [
+                {
+                    "name": "Flashbang",
+                    "type": "Button",
+                    "id": "999e3371-c2fa-4476-87fc-0665755f5af2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "New action1",
+                    "type": "Button",
+                    "id": "a70802e6-fe3c-4861-9051-09ac912813b1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "5f70044d-a8c4-4bf8-ae2e-43557d92b0cd",
+                    "path": "<XRController>{LeftHand}/triggerPressed",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Flashbang",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "18f13c6a-211c-46d6-a9ad-298c2d6fc4aa",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Flashbang",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ffce44be-9cd8-4542-95e6-d12504244440",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "New action1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

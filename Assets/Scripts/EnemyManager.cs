@@ -7,16 +7,16 @@ using static MazeGenerator;
 
 public class EnemyManager : MonoBehaviour
 {
-    public GameObject enemyPrefab;  // Àû ÇÁ¸®ÆÕ
-    public GameObject xrRig;        // ÇÃ·¹ÀÌ¾î (XR Rig)
-    public Text gameOverText;       // °ÔÀÓ ¿À¹ö ¸Ş½ÃÁö
-    public Button restartButton;         // Àç½ÃÀÛ ¹öÆ° UI
-
+    public GameObject enemyPrefab;  // ì  í”„ë¦¬íŒ¹
+    public GameObject xrRig;        // í”Œë ˆì´ì–´ (XR Rig)
+    public Text gameOverText;       // ê²Œì„ ì˜¤ë²„ ë©”ì‹œì§€
+    public Button restartButton;    // ì¬ì‹œì‘ ë²„íŠ¼ UI
 
     private List<GameObject> enemies = new List<GameObject>();
+    private bool isFlashbangActive = false; // í”Œë˜ì‹œë±… í™œì„±í™” ì—¬ë¶€
 
     /// <summary>
-    /// Àû »ı¼º
+    /// ì  ìƒì„±
     /// </summary>
     public void SpawnEnemies(int count, TileType[,] tile, int mazeSize, Transform mazeParent)
     {
@@ -26,46 +26,46 @@ public class EnemyManager : MonoBehaviour
 
             GameObject enemy = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity, mazeParent);
 
-            // NavMeshAgent ÄÄÆ÷³ÍÆ® È®ÀÎ ¹× ÃÊ±âÈ­
+            // NavMeshAgent ì»´í¬ë„ŒíŠ¸ í™•ì¸ ë° ì´ˆê¸°í™”
             NavMeshAgent agent = enemy.GetComponent<NavMeshAgent>();
             if (agent != null && agent.isOnNavMesh)
             {
-                agent.speed = 3.0f; // Àû ÀÌµ¿ ¼Óµµ ¼³Á¤
-                agent.isStopped = true; // ÃÊ±â »óÅÂ¿¡¼­ Á¤Áö
+                agent.speed = 3.0f; // ì  ì´ë™ ì†ë„ ì„¤ì •
+                agent.isStopped = true; // ì´ˆê¸° ìƒíƒœì—ì„œ ì •ì§€
             }
             else
             {
-                Debug.LogError("NavMeshAgent°¡ Àû¿¡ Ãß°¡µÇÁö ¾Ê¾Ò°Å³ª NavMesh À§¿¡ ¹èÄ¡µÇÁö ¾Ê¾Ò½À´Ï´Ù!");
+                Debug.LogError("NavMeshAgentê°€ ì ì— ì¶”ê°€ë˜ì§€ ì•Šì•˜ê±°ë‚˜ NavMesh ìœ„ì— ë°°ì¹˜ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤!");
             }
 
             enemies.Add(enemy);
         }
 
-        // 5ÃÊ ÈÄ¿¡ Àû ¿òÁ÷ÀÓ ½ÃÀÛ
+        // 5ì´ˆ í›„ì— ì  ì›€ì§ì„ ì‹œì‘
         StartCoroutine(EnableEnemyMovement());
     }
 
     /// <summary>
-    /// Àû ¿òÁ÷ÀÓÀ» È°¼ºÈ­ÇÏ´Â Coroutine
+    /// ì  ì›€ì§ì„ì„ í™œì„±í™”í•˜ëŠ” Coroutine
     /// </summary>
     private IEnumerator EnableEnemyMovement()
     {
-        yield return new WaitForSeconds(5f); // 5ÃÊ ´ë±â
+        yield return new WaitForSeconds(5f); // 5ì´ˆ ëŒ€ê¸°
 
         foreach (GameObject enemy in enemies)
         {
             NavMeshAgent agent = enemy.GetComponent<NavMeshAgent>();
             if (agent != null)
             {
-                agent.isStopped = false; // Àû ¿òÁ÷ÀÓ È°¼ºÈ­
+                agent.isStopped = false; // ì  ì›€ì§ì„ í™œì„±í™”
             }
         }
-        Debug.Log("¸ğµç ÀûÀÌ ¿òÁ÷ÀÌ±â ½ÃÀÛÇß½À´Ï´Ù!");
+        Debug.Log("ëª¨ë“  ì ì˜ ì›€ì§ì„ì´ í™œì„±í™”ë˜ì—ˆìŠµë‹ˆë‹¤!");
     }
 
     public void ClearEnemies()
     {
-        // ±âÁ¸ Àû Á¦°Å
+        // ëª¨ë“  ì  ì œê±°
         foreach (GameObject enemy in enemies)
         {
             if (enemy != null)
@@ -74,14 +74,20 @@ public class EnemyManager : MonoBehaviour
             }
         }
 
-        enemies.Clear(); // ¸®½ºÆ® ÃÊ±âÈ­
+        enemies.Clear(); // ë¦¬ìŠ¤íŠ¸ ì´ˆê¸°í™”
     }
 
     /// <summary>
-    /// ¸Å ÇÁ·¹ÀÓ¸¶´Ù ÇÃ·¹ÀÌ¾î¿Í Àû Ãæµ¹ È®ÀÎ
+    /// ì  ë¦¬ìŠ¤íŠ¸ì—ì„œ í”Œë ˆì´ì–´ì™€ì˜ ì¶©ëŒ í™•ì¸
     /// </summary>
     void Update()
     {
+        if (isFlashbangActive)
+        {
+            Debug.Log("í”Œë˜ì‹œë±… í™œì„±í™” ì¤‘: ì ì˜ ì¶”ì  ë° ì¶©ëŒ ì¤‘ë‹¨");
+            return; // í”Œë˜ì‹œë±… í™œì„±í™” ì¤‘ì—ëŠ” ì¶©ëŒ ê²€ì‚¬ ì¤‘ë‹¨
+        }
+
         foreach (GameObject enemy in enemies)
         {
             if (enemy == null) continue;
@@ -89,32 +95,33 @@ public class EnemyManager : MonoBehaviour
             NavMeshAgent agent = enemy.GetComponent<NavMeshAgent>();
             if (agent != null && !agent.isStopped)
             {
-                // ÇÃ·¹ÀÌ¾î À§Ä¡¸¦ ÀûÀÇ ¸ñÇ¥·Î ¼³Á¤
+                // í”Œë ˆì´ì–´ ìœ„ì¹˜ë¥¼ ì ì˜ ëª©í‘œë¡œ ì„¤ì •
                 agent.SetDestination(xrRig.transform.position);
             }
 
-            // Àû°ú ÇÃ·¹ÀÌ¾îÀÇ °Å¸® °è»ê
+            // ì ê³¼ í”Œë ˆì´ì–´ì˜ ê±°ë¦¬ ê³„ì‚°
             float distance = Vector3.Distance(enemy.transform.position, xrRig.transform.position);
 
-            if (distance < 0.5f) // Ãæµ¹ ½Ã
+            if (distance < 0.5f) // ì¶©ëŒ ì‹œ
             {
-                Debug.Log("»ó´ë¿¡°Ô ÀâÇû½À´Ï´Ù"); // ·Î±× Ãâ·Â
+                Debug.Log("í”Œë ˆì´ì–´ê°€ ì ì—ê²Œ ì¡í˜”ìŠµë‹ˆë‹¤!"); // ë¡œê·¸ ì¶œë ¥
                 GameOver();
                 break;
             }
             else
             {
-                Debug.Log("ÇÃ·¹ÀÌ¾î°¡ ¾ÆÁ÷ »ó´ë¿¡°Ô ÀâÈ÷Áö ¾Ê¾Ò½À´Ï´Ù.");
+                Debug.Log("í”Œë ˆì´ì–´ê°€ ì•„ì§ ì ì—ê²Œ ì¡íˆì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
             }
         }
     }
 
+
     /// <summary>
-    /// °ÔÀÓ ¿À¹ö Ã³¸®
+    /// ê²Œì„ ì˜¤ë²„ ì²˜ë¦¬
     /// </summary>
     void GameOver()
     {
-        // Game Over ¸Ş½ÃÁö Ç¥½Ã
+        // Game Over ë©”ì‹œì§€ í‘œì‹œ
         if (gameOverText != null)
         {
             gameOverText.text = "Game Over!";
@@ -122,27 +129,25 @@ public class EnemyManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Game Over Text°¡ ¼³Á¤µÇÁö ¾Ê¾Ò½À´Ï´Ù!");
+            Debug.LogError("Game Over Textê°€ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤!");
         }
 
-        // Restart ¹öÆ° Ç¥½Ã
+        // Restart ë²„íŠ¼ í‘œì‹œ
         if (restartButton != null)
         {
             restartButton.gameObject.SetActive(true);
         }
         else
         {
-            Debug.LogError("Restart ButtonÀÌ ¼³Á¤µÇÁö ¾Ê¾Ò½À´Ï´Ù!");
+            Debug.LogError("Restart Buttonì´ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤!");
         }
 
-        // °ÔÀÓ ¸ØÃã
+        // ê²Œì„ ë©ˆì¶¤
         Time.timeScale = 0;
     }
 
-
-
     /// <summary>
-    /// ºó Å¸ÀÏ¿¡¼­ ¹«ÀÛÀ§ À§Ä¡ ¹İÈ¯
+    /// ë¹ˆ íƒ€ì¼ì—ì„œ ë¬´ì‘ìœ„ ìœ„ì¹˜ ë°˜í™˜
     /// </summary>
     private Vector3 GetRandomEmptyPosition(TileType[,] tile, int mazeSize)
     {
@@ -153,10 +158,55 @@ public class EnemyManager : MonoBehaviour
             x = Random.Range(1, mazeSize - 1);
             y = Random.Range(1, mazeSize - 1);
 
-            if (tile[y, x] == TileType.Empty) // ºó Ä­ÀÌ¸é À§Ä¡ ¹İÈ¯
+            if (tile[y, x] == TileType.Empty) // ë¹ˆ ì¹¸ì´ë©´ ìœ„ì¹˜ ë°˜í™˜
             {
-                return new Vector3(x, 0, y); // NavMesh Bake ³ôÀÌ¿¡ ¸Â°Ô Y°ª Á¶Á¤
+                return new Vector3(x, 0, y); // NavMesh Bake ë†’ì´ì— ë§ê²Œ Yê°’ ì¡°ì •
             }
         }
+    }
+
+    /// <summary>
+    /// í”Œë˜ì‹œë±… ì‚¬ìš©
+    /// </summary>
+    public void TriggerFlashbang()
+    {
+        isFlashbangActive = true;
+        Debug.Log($"í”Œë˜ì‹œë±… í™œì„±í™”ë¨: {isFlashbangActive}");
+
+        foreach (GameObject enemy in enemies)
+        {
+            Collider enemyCollider = enemy.GetComponent<Collider>();
+            Collider playerCollider = xrRig.GetComponent<Collider>();
+
+            if (enemyCollider != null && playerCollider != null)
+            {
+                Physics.IgnoreCollision(playerCollider, enemyCollider, true); // ì¶©ëŒ ë¬´ì‹œ
+            }
+
+            NavMeshAgent agent = enemy.GetComponent<NavMeshAgent>();
+            if (agent != null)
+            {
+                StartCoroutine(DisableEnemyTemporarily(agent, 5f)); // 5ì´ˆ ë™ì•ˆ ë©ˆì¶¤
+            }
+        }
+
+        // 5ì´ˆ í›„ í”Œë˜ì‹œë±… ë¹„í™œì„±í™”
+        StartCoroutine(EndFlashbang(5f));
+    }
+
+
+    private IEnumerator EndFlashbang(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        isFlashbangActive = false;
+        Debug.Log("í”Œë˜ì‹œë±… ë¹„í™œì„±í™”ë¨: " + isFlashbangActive);
+    }
+
+
+    private IEnumerator DisableEnemyTemporarily(NavMeshAgent agent, float duration)
+    {
+        agent.isStopped = true; // ì  ë©ˆì¶¤
+        yield return new WaitForSeconds(duration); // ëŒ€ê¸°
+        agent.isStopped = false; // ì  ë‹¤ì‹œ ì›€ì§ì„
     }
 }
