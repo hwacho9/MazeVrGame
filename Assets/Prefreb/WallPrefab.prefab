@@ -126,6 +126,8 @@ MonoBehaviour:
   xrRig: {fileID: 0}
   miniMapImage: {fileID: 0}
   enemyManager: {fileID: 0}
+  endGameText: {fileID: 0}
+  restartButton: {fileID: 0}
 --- !u!208 &-3636144083713324596
 NavMeshObstacle:
   m_ObjectHideFlags: 0

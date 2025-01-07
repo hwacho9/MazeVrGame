@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using TMPro;
 
 public class MazeGenerator : MonoBehaviour
 {
@@ -12,12 +14,16 @@ public class MazeGenerator : MonoBehaviour
     public GameObject xrRig;             // XR Rig (플레이어)
     public RawImage miniMapImage;        // 미니맵을 표시할 UI 이미지
     public EnemyManager enemyManager;    // EnemyManager 참조
+    public TextMeshProUGUI endGameText;             // 종료 메시지 UI
+    public Button restartButton;         // 재시작 버튼 UI
 
     private TileType[,] tile;            // 미로 배열 (Wall, Empty)
     private Vector3 startPosition;       // 시작 지점
     private Vector3 exitPosition;        // 종료 지점
     private Texture2D miniMapTexture;    // 미니맵 텍스처
     private Vector2Int lastPlayerPosition; // 이전 플레이어 위치
+
+    private Color lastPlayerTileColor;   // 이전 플레이어 위치의 색상 저장 변수
 
     public enum TileType { Wall, Empty };
 
@@ -31,17 +37,19 @@ public class MazeGenerator : MonoBehaviour
         GenerateMiniMap();   // 미니맵 생성
 
         // 적 생성 요청
-        enemyManager.SpawnEnemies(3, tile, size, transform);
+        enemyManager.SpawnEnemies(0, tile, size, transform);
+
+        // UI 초기화
+        endGameText.gameObject.SetActive(false);
+        restartButton.gameObject.SetActive(false);
     }
 
     void Update()
     {
         UpdatePlayerOnMiniMap(); // 매 프레임마다 미니맵에서 플레이어 위치 갱신
+        CheckExitReached();      // 종료 지점 도달 여부 확인
     }
 
-    /// <summary>
-    /// 미로 초기화
-    /// </summary>
     public void Initialize(int size)
     {
         if (size % 2 == 0)
@@ -60,12 +68,8 @@ public class MazeGenerator : MonoBehaviour
         exitPosition = new Vector3(size - 2, 0, size - 2);   // (size-2, size-2)
     }
 
-    /// <summary>
-    /// Binary Tree 알고리즘으로 미로 생성
-    /// </summary>
     void GenerateByBinaryTree()
     {
-        // 1) 모든 셀을 일단 벽으로 초기화
         for (int y = 0; y < size; y++)
         {
             for (int x = 0; x < size; x++)
@@ -74,7 +78,6 @@ public class MazeGenerator : MonoBehaviour
             }
         }
 
-        // 2) 내부(홀수 좌표)에 대해서 Empty로 만들기
         for (int y = 1; y < size; y += 2)
         {
             for (int x = 1; x < size; x += 2)
@@ -83,7 +86,6 @@ public class MazeGenerator : MonoBehaviour
             }
         }
 
-        // 3) Binary Tree 규칙 적용: 각 (홀수, 홀수) 셀마다 북쪽 or 서쪽 벽 허물기
         System.Random rand = new System.Random();
 
         for (int y = 1; y < size; y += 2)
@@ -92,13 +94,13 @@ public class MazeGenerator : MonoBehaviour
             {
                 if (y == 1 && x == 1)
                 {
-                    continue; // (1,1)은 아무 것도 뚫지 않음
+                    continue;
                 }
-                else if (y == 1) // 맨 위 줄이면 서쪽만 뚫기
+                else if (y == 1)
                 {
                     CarveWest(x, y);
                 }
-                else if (x == 1) // 맨 왼쪽 열이면 북쪽만 뚫기
+                else if (x == 1)
                 {
                     CarveNorth(x, y);
                 }
@@ -118,9 +120,6 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 북쪽 벽 허물기
-    /// </summary>
     void CarveNorth(int x, int y)
     {
         if (y - 1 >= 0 && tile[y - 1, x] == TileType.Wall)
@@ -129,9 +128,6 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 서쪽 벽 허물기
-    /// </summary>
     void CarveWest(int x, int y)
     {
         if (x - 1 >= 0 && tile[y, x - 1] == TileType.Wall)
@@ -140,9 +136,6 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 경로 보장 (BFS로 시작점~종료점 연결 확인)
-    /// </summary>
     void EnsurePath()
     {
         if (!CheckIfPathExists())
@@ -227,9 +220,6 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 종료 지점 생성
-    /// </summary>
     void PlaceExit()
     {
         if (exitPrefab != null)
@@ -238,8 +228,6 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 플레이어(XR Rig) 시작위치로 이동
     void PlaceXRRig()
     {
         if (xrRig != null)
@@ -248,14 +236,9 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    /// <summary>
     void GenerateMiniMap()
     {
-        int pixelScale = 1; // 1 타일당 픽셀 크기 (확장 비율)
-        int mapSize = size * pixelScale; // 텍스처 크기 = 미로 크기 * 픽셀 크기
-
-        // 텍스처 초기화
-        miniMapTexture = new Texture2D(mapSize, mapSize);
+        miniMapTexture = new Texture2D(size, size);
         miniMapTexture.filterMode = FilterMode.Point;
         miniMapTexture.wrapMode = TextureWrapMode.Clamp;
 
@@ -263,58 +246,116 @@ public class MazeGenerator : MonoBehaviour
         {
             for (int x = 0; x < size; x++)
             {
-                // 색상 결정: 벽, 시작 지점, 종료 지점, 경로
                 Color color = tile[y, x] == TileType.Wall ? Color.black : Color.white;
-                if (x == 1 && y == 1) color = Color.green; // 시작 지점
-                if (x == size - 2 && y == size - 2) color = Color.red; // 종료 지점
-
-                // 픽셀 확장: 한 타일을 여러 픽셀로 채움
-                for (int dy = 0; dy < pixelScale; dy++)
-                {
-                    for (int dx = 0; dx < pixelScale; dx++)
-                    {
-                        miniMapTexture.SetPixel(x * pixelScale + dx, y * pixelScale + dy, color);
-                    }
-                }
+                if (x == 1 && y == 1) color = Color.green;
+                if (x == size - 2 && y == size - 2) color = Color.red;
+                miniMapTexture.SetPixel(x, y, color);
             }
         }
 
-        miniMapTexture.Apply(); // 텍스처 적용
-        miniMapImage.texture = miniMapTexture; // UI 이미지에 텍스처 적용
+        miniMapTexture.Apply();
+        miniMapImage.texture = miniMapTexture;
     }
-
-
-    /// <summary>
-    /// 미니맵에서 플레이어의 위치를 매 프레임 갱신
-    /// </summary>
-    private Color lastPlayerTileColor; // 이전 플레이어 위치의 색상 저장 변수
 
     void UpdatePlayerOnMiniMap()
     {
         if (xrRig == null || miniMapTexture == null) return;
 
-        // 현재 플레이어 위치를 미로의 좌표로 변환
         Vector3 playerPosition = xrRig.transform.position;
         int playerX = Mathf.Clamp(Mathf.RoundToInt(playerPosition.x), 0, size - 1);
         int playerY = Mathf.Clamp(Mathf.RoundToInt(playerPosition.z), 0, size - 1);
 
-        // 이전 위치를 원래 색상으로 되돌림
         if (lastPlayerPosition != Vector2Int.zero)
         {
             miniMapTexture.SetPixel(lastPlayerPosition.x, lastPlayerPosition.y, lastPlayerTileColor);
         }
 
-        // 현재 위치의 기존 색상을 저장
         lastPlayerTileColor = miniMapTexture.GetPixel(playerX, playerY);
-
-        // 현재 위치를 파란색으로 표시
         miniMapTexture.SetPixel(playerX, playerY, Color.blue);
 
-        miniMapTexture.Apply(); // 텍스처 갱신
-
-        // 이전 위치 업데이트
+        miniMapTexture.Apply();
         lastPlayerPosition = new Vector2Int(playerX, playerY);
     }
 
+    void CheckExitReached()
+    {
+        Vector3 playerPosition = xrRig.transform.position;
+        float distance = Vector3.Distance(playerPosition, exitPosition);
+
+        Debug.Log($"플레이어 위치: {playerPosition}, 종료 지점: {exitPosition}, 거리: {distance}");
+
+        if (distance < 0.5f)
+        {
+            Debug.Log("플레이어가 종료 지점에 도착했습니다!"); // 로그 출력
+            EndGame();
+        }
+        else
+        {
+            Debug.Log("플레이어가 아직 종료 지점에 도달하지 않았습니다.");
+        }
+    }
+
+
+    void EndGame()
+    {
+        // 종료 메시지 및 재시작 버튼 활성화
+        if (endGameText != null && restartButton != null)
+        {
+            endGameText.text = "탈출 성공! 게임 종료!";
+            endGameText.gameObject.SetActive(true);
+            restartButton.gameObject.SetActive(true);
+
+            // 게임 멈춤
+            Time.timeScale = 0;
+
+            Debug.Log("게임 종료 화면이 표시되었습니다.");
+        }
+        else
+        {
+            Debug.LogError("endGameText 또는 restartButton이 설정되지 않았습니다. UI를 확인하세요.");
+        }
+    }
+
+
+    public void RestartGame()
+    {
+        // 기존 맵 제거
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // 미니맵 텍스처 초기화
+        if (miniMapTexture != null)
+        {
+            Destroy(miniMapTexture);
+        }
+
+        // Time.timeScale을 다시 1로 설정
+        Time.timeScale = 1;
+
+        // 종료 메시지와 버튼 숨김
+        if (endGameText != null)
+        {
+            endGameText.gameObject.SetActive(false);
+        }
+        if (restartButton != null)
+        {
+            restartButton.gameObject.SetActive(false);
+        }
+
+        // 미로 재생성
+        Initialize(size);    // 미로 배열 초기화
+        DrawMaze();          // 미로 그리기
+        EnsurePath();        // 경로 확인
+        PlaceExit();         // 종료 지점 설정
+        PlaceXRRig();        // 플레이어 시작 위치로 이동
+        GenerateMiniMap();   // 미니맵 재생성
+
+        // 적 재생성
+        enemyManager.SpawnEnemies(1, tile, size, transform);
+
+        Debug.Log("맵과 게임이 재시작되었습니다!");
+    }
 
 }
