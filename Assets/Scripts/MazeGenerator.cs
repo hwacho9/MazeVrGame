@@ -37,7 +37,7 @@ public class MazeGenerator : MonoBehaviour
         GenerateMiniMap();   // 미니맵 생성
 
         // 적 생성 요청
-        enemyManager.SpawnEnemies(0, tile, size, transform);
+        enemyManager.SpawnEnemies(1, tile, size, transform);
 
         // UI 초기화
         endGameText.gameObject.SetActive(false);
@@ -353,6 +353,7 @@ public class MazeGenerator : MonoBehaviour
         GenerateMiniMap();   // 미니맵 재생성
 
         // 적 재생성
+        enemyManager.ClearEnemies(); // 적 목록 초기화
         enemyManager.SpawnEnemies(1, tile, size, transform);
 
         Debug.Log("맵과 게임이 재시작되었습니다!");
